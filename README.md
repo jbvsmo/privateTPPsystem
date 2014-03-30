@@ -6,7 +6,7 @@ The idea for this code is to be able to have a private session of "Twitch Plays 
 Installing the server might require a little bit of effort. Right now the code was tested on Windows,
 but may work on other platforms.
 
-**Status:** It works quite well, but some bugfix might be needed.
+**Status:** It works quite well, but some bug fix might be needed.
 
 
 What you will need:
@@ -31,7 +31,7 @@ Please contribute with changes/bug reports for this code if you want!
 How to install the server:
 --------------------------
 
-The instalation of Python 3 and PyQt4 are pretty much straightforward.
+The installation of Python 3 and PyQt4 are pretty much straightforward.
 
 "Max Remote Server" is a tool to be used with the "Max Remote" android app. This application is
 not mine and I cannot control what changes they might do on it. I only chose it because the server
@@ -92,7 +92,7 @@ Customize the Gameplay
     - On "Raffle", the inputs will be counted for a certain period of time (Raffle Time) and, after this
     period, one of the inputs will be *chosen at random*.
 
-- If one wants to have a gameplay more like the original Twitch Plays Pokemon, the inputs may be delayed (Delay).
+- If one wants to have a gameplay more like the original Twitch Plays Pokémon, the inputs may be delayed (Delay).
 
 - Once players connect to the server, their IP address will appear on the Player list. You can select them and click
 the "E" button to edit their names. Try adding one user at a time to be able to tell know which one they are.
@@ -103,20 +103,20 @@ the "E" button to edit their names. Try adding one user at a time to be able to 
 the selected one to avoid clustering -- adds more entropy).
 
 
-TODO
-----
+TO DO
+-----
 
 Some options in the interface do not work yet and some others may be added
 
 - Create personalities for bots
     1. Only press a single button/a set of buttons
     2. Play against/with the majority of commands of last seconds
-    3. Always play after some other player (to help/harm they)
+    3. Always play after some other player (to help/harm them)
 - Install Democracy (or Raffle) each X minutes.
 - Vote for democracy/anarchy/raffle
 - Add timer to show how much time of democracy until the command is executed (like a bar)
 - Log the data (IMPORTANT!). Possibly show some stats later.
-- Fix some bugs on the interface. Make the commands window pretier.
+- Fix some bugs on the interface. Make the commands window prettier.
 
 
 
