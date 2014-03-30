@@ -117,3 +117,10 @@ Some options in the interface do not work yet and some others may be added
 - Add timer to show how much time of democracy until the command is executed (like a bar)
 - Log the data (IMPORTANT!). Possibly show some stats later.
 - Fix some bugs on the interface. Make the commands window pretier.
+
+
+
+Screenshot
+----------
+
+![](http://i.imgur.com/AmVOcFz.png)
