@@ -24,7 +24,7 @@ What you will need:
     - [Max Remote](https://play.google.com/store/apps/details?id=com.bitunits.maxremote)
 
 
-Please contribute with changes/bug reports for this code if you want!
+Please contribute with changes/bug reports if you want!
 
 
 
@@ -46,7 +46,7 @@ I don't know the minimal version or if it only works with Oracle JVM.
 The first time running Max Remote Server it will create a simple configuration file with 3 lines:
 
     8585
-    x
+    n
     i
 
 The first line tells which port it will connect. Change that to `8589` (If you want another port,
@@ -62,7 +62,7 @@ How to play
 On the server:
 
 1. Start "Max Remote Server" after changing the port
-2. Run the "main.py" file (Double clicking on windows should work)
+2. Run the `main.py` file (Double clicking on Windows should work)
 3. Start the emulator
 4. You will need to map the keys in the emulator.
     The keys are `A: A`, `B: B`, `START: C`, `SELECT: D`, `LEFT: E`, `UP: F`, `RIGHT: G`, `DOWN: H`.

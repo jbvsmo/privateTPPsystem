@@ -8,11 +8,6 @@ conf_file = os.path.join(dir, 'TwitchController.config')
 enabled = True
 
 
-#def enable(val):
-#    global enabled
-#    enabled = val
-
-
 #------------------------------------------------------
 # Config Parser
 class EvalParser(configparser.ConfigParser):
