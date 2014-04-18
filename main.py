@@ -1,14 +1,40 @@
 from collections import deque
 import sys
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 import config
 import form
 import form_cmd
+import form_buttons
 import randomness
 import server
 import controller
 from user import User, PCUser, PersonUser
+
+
+class ClickLineEdit(QtGui.QLineEdit):
+    key_dict = {v: k.split('_', 1)[-1] for k, v in
+                QtCore.Qt.__dict__.items() if k.startswith('Key_')}
+
+    def __init__(self, name, value, *args):
+        super().__init__(*args)
+        self.name = name
+        self.key_value = None
+        self.set_key(value)
+
+    def set_key(self, value):
+        self.setText(self.key_dict[value])
+        self.key_value = value
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            try:
+                self.set_key(event.key())
+            except KeyError:
+                pass
+            return True
+
+        return super().event(event)
 
 
 class Main(object):
@@ -17,6 +43,9 @@ class Main(object):
         self.app = QtGui.QApplication(sys.argv)
         self.window = QtGui.QMainWindow()
         self.cmd_window = QtGui.QMainWindow()
+
+        self.btn_window = None
+        self.widget_buttons = []
 
         self.ui = form.Ui_MainWindow()
         self.ui.setupUi(self.window)
@@ -169,6 +198,43 @@ class Main(object):
             User.users.pop(name)  # Let gc do its job...
             self.ui.table_user.takeTopLevelItem(idx.row())
 
+        def _button_option_block(buttons, widget):
+            layout = QtGui.QVBoxLayout()
+            layout.setSpacing(0)
+            layout.setMargin(0)
+            btns = []
+            for cmd, value in buttons:
+                inner = QtGui.QWidget()
+                inner_layout = QtGui.QHBoxLayout()
+                inner_layout.setSpacing(0)
+                inner_layout.setMargin(0)
+                inner_layout.addWidget(QtGui.QLabel(cmd.capitalize()))
+                inner_layout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum))
+                line_edit = ClickLineEdit(cmd, int(value))
+                btns.append(line_edit)
+                line_edit.setMaximumWidth(80)
+                inner_layout.addWidget(line_edit)
+                inner.setLayout(inner_layout)
+                layout.addWidget(inner)
+            widget.setLayout(layout)
+            return btns
+
+        def save_buttons_value():
+            for widget in self.widget_buttons:
+                controller.button_hold[widget.name] = str(widget.key_value).encode('ascii')
+
+        def set_buttons():
+            self.btn_window = QtGui.QMainWindow()
+            ui = form_buttons.Ui_MainWindow()
+            ui.setupUi(self.btn_window)
+            btns = list(controller.button_hold.items())
+            self.widget_buttons = \
+                _button_option_block(btns[:len(btns)//2], ui.buttons_1) + \
+                _button_option_block(btns[len(btns)//2:], ui.buttons_2)
+
+            ui.pushButton.clicked.connect(save_buttons_value)
+            self.btn_window.show()
+
         self.ui.activate.clicked.connect(config.set_variable('enabled'))
         self.ui.random_name.clicked.connect(lambda: self.ui.edit_name.setText(randomness.select_name()))
         self.ui.lst_add.clicked.connect(add_user)
@@ -182,6 +248,7 @@ class Main(object):
         self.ui.time_delay.valueChanged.connect(config.set_variable('delay'))
         self.ui.mode.currentIndexChanged.connect(set_mode)
         self.ui.lst_del.clicked.connect(delete_user)
+        self.ui.set_buttons.clicked.connect(set_buttons)
 
         set_mode(config.mode_idx(config.selected))
 

@@ -605,6 +605,19 @@
       <double>0.050000000000000</double>
      </property>
     </widget>
+    <widget class="QPushButton" name="set_buttons">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set Buttons</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="connection">
     <property name="geometry">

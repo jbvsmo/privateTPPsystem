@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'form.ui'
 #
-# Created: Fri Mar 28 15:05:52 2014
+# Created: Fri Apr 18 01:36:28 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -191,6 +191,9 @@ class Ui_MainWindow(object):
         self.time_button_hold.setSingleStep(0.01)
         self.time_button_hold.setProperty("value", 0.05)
         self.time_button_hold.setObjectName(_fromUtf8("time_button_hold"))
+        self.set_buttons = QtGui.QPushButton(self.frame_6)
+        self.set_buttons.setGeometry(QtCore.QRect(10, 40, 75, 23))
+        self.set_buttons.setObjectName(_fromUtf8("set_buttons"))
         self.connection = QtGui.QLabel(self.centralwidget)
         self.connection.setGeometry(QtCore.QRect(210, 20, 91, 16))
         self.connection.setObjectName(_fromUtf8("connection"))
@@ -257,6 +260,7 @@ class Ui_MainWindow(object):
         self.label_9.setText(_translate("MainWindow", "Interval (min)", None))
         self.label_10.setText(_translate("MainWindow", "Duration (min)", None))
         self.box_hold_button.setText(_translate("MainWindow", "Click Buttons", None))
+        self.set_buttons.setText(_translate("MainWindow", "Set Buttons", None))
         self.connection.setText(_translate("MainWindow", "Not Connected...", None))
         self.activate.setText(_translate("MainWindow", "Enable", None))
 

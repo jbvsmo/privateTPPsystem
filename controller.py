@@ -27,29 +27,32 @@ original_map = {
     b'38': 'up',
     b'39': 'right',
     b'40': 'down',
+    b'76': 'l',
+    b'82': 'r',
+    b'88': 'x',
+    b'89': 'y',
 }
 
-# Button to be sent to Max Remote Server
+# Button to be sent to Max Remote Server by default
 # The choice is A, B, C, ... because it is
 # less harmful than the original with control characters
-button_hold = {
-    'a': b'65',       # A
-    'b': b'66',       # B
-    'start': b'67',   # C
-    'select': b'68',  # D
-    'left': b'69',    # E
-    'up': b'70',      # F
-    'right': b'71',   # G
-    'down': b'72',    # H
-}
+button_hold = collections.OrderedDict([
+    ('a', b'65'),       # A
+    ('b', b'66'),       # B
+    ('start', b'67'),   # C
+    ('select', b'68'),  # D
+    ('left', b'69'),    # E
+    ('up', b'70'),      # F
+    ('right', b'71'),   # G
+    ('down', b'72'),    # H
+    ('l', b'76'),       # L
+    ('r', b'82'),       # R
+    ('x', b'88'),       # X
+    ('y', b'89'),       # Y
+])
 
 cmds = list(button_hold)
 maxlen_cmd = max(len(i) for i in cmds)
-
-button_hold_chr = {
-    k: b'c' + chr(int(v)).lower().encode('ascii')
-    for k, v in button_hold.items()
-}
 
 
 def find_command(val):
@@ -190,7 +193,7 @@ class Controller(object):
             print('Command not sent...')
 
     def send_udp(self, cmd):
-        cmd = button_hold_chr[cmd]
+        cmd = b'c' + button_hold[cmd]
         if self.udp is None:
             self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.udp.sendto(cmd, (self.ADDR, self.PORT))
