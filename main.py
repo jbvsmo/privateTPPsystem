@@ -45,7 +45,7 @@ class ClickLineEdit(QtGui.QLineEdit):
 
 
 def set_fossil(window):
-    window.setWindowIcon(QtGui.QIcon('fossil.png'))
+    window.setWindowIcon(QtGui.QIcon('data/fossil.png'))
 
 
 class Main(object):
