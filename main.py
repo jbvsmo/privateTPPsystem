@@ -12,6 +12,13 @@ import controller
 from user import User, PCUser, PersonUser
 
 
+if 'win' in sys.platform:
+    # Fix the task bar icon for Windows
+    import ctypes
+    ctypes.windll.shell32.\
+        SetCurrentProcessExplicitAppUserModelID('com.privateTPPsystem')
+
+
 class ClickLineEdit(QtGui.QLineEdit):
     key_dict = {v: k.split('_', 1)[-1] for k, v in
                 QtCore.Qt.__dict__.items() if k.startswith('Key_')}
@@ -37,12 +44,18 @@ class ClickLineEdit(QtGui.QLineEdit):
         return super().event(event)
 
 
+def set_fossil(window):
+    window.setWindowIcon(QtGui.QIcon('fossil.png'))
+
+
 class Main(object):
 
     def __init__(self):
         self.app = QtGui.QApplication(sys.argv)
         self.window = QtGui.QMainWindow()
         self.cmd_window = QtGui.QMainWindow()
+        set_fossil(self.window)
+        set_fossil(self.cmd_window)
 
         self.btn_window = None
         self.widget_buttons = []
@@ -222,6 +235,7 @@ class Main(object):
 
         def set_buttons():
             self.btn_window = QtGui.QMainWindow()
+            set_fossil(self.btn_window)
             ui = form_buttons.Ui_MainWindow()
             ui.setupUi(self.btn_window)
             btns = list(controller.button_hold.items())
