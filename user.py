@@ -73,5 +73,8 @@ class PCUser(User):
             time.sleep(t)
             cmd = random.choice(controller.cmds)
             print('NAME:', self.name, '| SLEPT:', t, '| SENT:', cmd)
-            controller.controller.send_command((cmd, b'a'), correct_cmd=True, user=self.name)
+            controller.controller_instance.send_command(
+                (cmd, controller.CommandType.button_press),
+                correct_cmd=True, user=self.name
+            )
 

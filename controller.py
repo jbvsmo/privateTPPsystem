@@ -7,12 +7,18 @@ import collections
 import config
 
 
-_base_button = b'\x00\x03'
-_base_press = b'a'
-_base_release = b'b'
+class CommandType(object):
+    button_press = b'a'
+    button_release = b'b'
+    text = b'c'
 
+
+# Byte sent to denote a new command
+command_header = b'\x00'
+
+
+# Button pressed on Max Remote
 original_map = {
-    # Button pressed
     b'65': 'a',
     b'66': 'b',
     b'10': 'start',
@@ -23,15 +29,18 @@ original_map = {
     b'40': 'down',
 }
 
+# Button to be sent to Max Remote Server
+# The choice is A, B, C, ... because it is
+# less harmful than the original with control characters
 button_hold = {
-    'a': b'65',
-    'b': b'66',
-    'start': b'67',
-    'select': b'68',
-    'left': b'69',
-    'up': b'70',
-    'right': b'71',
-    'down': b'72',
+    'a': b'65',       # A
+    'b': b'66',       # B
+    'start': b'67',   # C
+    'select': b'68',  # D
+    'left': b'69',    # E
+    'up': b'70',      # F
+    'right': b'71',   # G
+    'down': b'72',    # H
 }
 
 cmds = list(button_hold)
@@ -44,22 +53,25 @@ button_hold_chr = {
 
 
 def find_command(val):
-    if not val.startswith(_base_button):
-        return None
-
-    val = val[len(_base_button):]
     st = val[:1]
-    val = original_map.get(val[1:3])
+    val = val[1:]
+    if st == CommandType.text:
+        return val.decode('utf-8'), st
+    val = original_map.get(bytes(val))
     if val is None:
         return None
 
     return val, st
 
 
-class Controller(object):
-    ADDR = '127.0.0.1'
-    PORT = 8589
+def build_command(st, val):
+    data = st + val
+    return command_header + bytes([len(data)]) + data
 
+
+class Controller(object):
+    ADDR = config.parser.gete('origin', 'addr')
+    PORT = config.parser.gete('origin', 'port')
     cmd_callback = lambda *args: None
     grab_callback = lambda *args: None
 
@@ -131,38 +143,37 @@ class Controller(object):
         while True:
             self.modes[config.selected]()
 
-    def send_command(self, cmd, correct_cmd=False, user=''):
+    def send_command(self, cmd, user=''):
         if not config.enabled:
-            return
-
-        if not correct_cmd:
-            cmd = find_command(cmd)
-        if cmd is None:
             return
 
         cmd, st = cmd
         if config.hold_click:
-            if st != _base_press:
+            if st != CommandType.button_press:
                 return  # Do not send at command end
-            #self.send_click(cmd)
             with self.cmds_lock:
                 self.commands.put((cmd, user))
         else:
+            # TODO: This should be disabled at least on
+            # Democracy/Raffle modes. It may break the game
+            # with multiple people holding commands at the same time
             self.send_click(cmd, st)
 
     def send_click(self, cmd, st=None):
-        sst = _base_press if st is None else st
+        sst = CommandType.button_press if st is None else st
 
         if config.delay:
             time.sleep(config.delay)
-        self.send_message(_base_button + sst + button_hold[cmd])
+        self.send_message(build_command(sst, button_hold[cmd]))
         if st is not None:
             return
 
         time.sleep(config.click_duration)
-        self.send_message(_base_button + _base_release + button_hold[cmd])
+        self.send_message(build_command(CommandType.button_release, button_hold[cmd]))
 
     def send_message(self, msg):
+        """ Low level function to handle connections and send atual data to TCP socket.
+        """
         if self.conn is None:
             self.connect()
 
@@ -185,4 +196,4 @@ class Controller(object):
         self.udp.sendto(cmd, (self.ADDR, self.PORT))
 
 
-controller = Controller()
+controller_instance = Controller()

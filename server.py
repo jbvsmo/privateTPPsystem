@@ -1,8 +1,9 @@
 import socketserver
 import threading
 import config
-from controller import controller
-from user import User, PersonUser
+import buffer
+import controller
+from user import PersonUser
 
 
 class OriginServer(object):
@@ -24,21 +25,43 @@ class UDPServer(
 
 
 class Handler(socketserver.BaseRequestHandler):
+    user = None
+    buffer = None
+
     def handle(self):
+        self.buffer = buffer.Buffer(self.request)
         ip = self.client_address[0]
-        print('TCP Connection:', ip)
-        user = PersonUser.get(ip, ip)
-        print(user)
-        print(User.users)
+        self.user = PersonUser.get(ip, ip)
+        print('TCP Connection:', self.user)
 
         while True:
-            data = self.request.recv(64)
-            if not data:
-                break
-            print('Data:', repr(data), list(data))
-            controller.send_command(data, user=user.name)
-            #print('Sent to origin')
-        #self.request.sendall(data, self.client_address)
+            try:
+                content = self.read_command()
+            except buffer.SocketClosedError:
+                return
+            self.handle_content(content)
+
+    def read_command(self):
+        startbyte = None
+        while startbyte != controller.command_header:
+            startbyte = self.buffer.read(1, True)
+
+        size = self.buffer.read(1, True)
+        return self.buffer.read(size[0], True)
+
+    def handle_content(self, content):
+        print('Data @ {0.name}, {0.ip}:'.format(self.user), bytes(content), list(content))
+
+        content = controller.find_command(content)
+        if content is None:
+            return
+
+        cmd, st = content
+        if st == controller.CommandType.text:
+            self.user.name = cmd  # TODO change user name on interface too?
+            return
+
+        controller.controller_instance.send_command(content, user=self.user.name)
 
 
 class UDPHandler(Handler):
