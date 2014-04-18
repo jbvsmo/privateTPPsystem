@@ -77,7 +77,6 @@ class Main(object):
         self.uic.f_democracy.setShown(False)
 
     def load_config(self):
-        #conf = config.parser
         self.ui.activate.setChecked(config.enabled)
         self.ui.box_hold_button.setChecked(config.hold_click)
         self.ui.time_button_hold.setValue(config.click_duration)
@@ -148,7 +147,6 @@ class Main(object):
                 self.ui.table_user.itemFromIndex(self.current_user[0]).setText(0, name)
                 user = self.current_user[1]
             else:
-                #self.insert_user(name)
                 user = PersonUser(name, ip)
 
             user.name = name
@@ -166,7 +164,6 @@ class Main(object):
                 self.ui.table_user.itemFromIndex(self.current_user[0]).setText(0, name)
                 user = self.current_user[1]
             else:
-                #self.insert_user(name)
                 user = PCUser(name, period, None)
 
             user.name = name

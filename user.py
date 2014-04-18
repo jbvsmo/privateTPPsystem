@@ -3,6 +3,8 @@ import threading
 import time
 import controller
 
+import config
+
 
 class User(object):
     users = {}
@@ -20,7 +22,6 @@ class User(object):
 
         if self._require_callback:
             self._require_callback = False
-            # noinspection PyArgumentList
             User.callback(self.name)
 
     @classmethod
@@ -74,7 +75,12 @@ class PCUser(User):
             cmd = random.choice(controller.cmds)
             print('NAME:', self.name, '| SLEPT:', t, '| SENT:', cmd)
             controller.controller_instance.send_command(
-                (cmd, controller.CommandType.button_press),
-                correct_cmd=True, user=self.name
+                (cmd, controller.CommandType.button_press), user=self.name
             )
+
+            if not config.hold_click:
+                # Send button release if the "Click Buttons" feature is disabled
+                controller.controller_instance.send_command(
+                    (cmd, controller.CommandType.button_release), user=self.name
+                )
 
