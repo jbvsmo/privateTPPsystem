@@ -5,7 +5,7 @@ import socket
 import time
 import collections
 import config
-
+from log import logger
 
 class CommandType(object):
     button_press = b'a'
@@ -50,6 +50,13 @@ button_hold = collections.OrderedDict([
     ('x', b'88'),       # X
     ('y', b'89'),       # Y
 ])
+
+button_text = {
+    'left': '\u2190',
+    'up': '\u2191',
+    'right': '\u2192',
+    'down': '\u2193',
+}
 
 cmds = list(button_hold)
 maxlen_cmd = max(len(i) for i in cmds)
@@ -105,6 +112,7 @@ class Controller(object):
 
     def _anarchy(self):
         c = self._queue_get()
+        logger.debug(type='gameplay', action='anarchy', content=c)
         self._start_send_thread(c)
 
     def _grab(self, time_limit):
@@ -128,6 +136,7 @@ class Controller(object):
             return
         c = cnt.most_common(1)[0][0]
         self.grab_callback(None, c)
+        logger.debug(type='gameplay', action='democracy', content=[c, cnt])
         self._start_send_thread(c)
 
     def _raffle(self):
@@ -135,11 +144,11 @@ class Controller(object):
         cnt = self._grab(config.raffle_time)
         if not cnt:
             return
-        print(cnt.most_common())
         for k, x in cnt.items():
             lst += [k] * x
         c = random.choice(lst)
         self.grab_callback(None, c)
+        logger.debug(type='gameplay', action='raffle', content=[c, cnt])
         self._start_send_thread(c)
 
     def run_queue(self):

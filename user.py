@@ -4,6 +4,7 @@ import time
 import controller
 
 import config
+from log import logger
 
 
 class User(object):
@@ -73,7 +74,8 @@ class PCUser(User):
                 t = self.period
             time.sleep(t)
             cmd = random.choice(controller.cmds)
-            print('NAME:', self.name, '| SLEPT:', t, '| SENT:', cmd)
+            logger.debug(type='bot', action='play', name=self.name,
+                         content={'sleep': t, 'command': cmd})
             controller.controller_instance.send_command(
                 (cmd, controller.CommandType.button_press), user=self.name
             )

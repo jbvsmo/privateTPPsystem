@@ -10,6 +10,7 @@ import form_buttons
 import randomness
 import server
 import controller
+import log
 from user import User, PCUser, PersonUser
 
 
@@ -122,6 +123,8 @@ class Main(object):
         else:
             dq = self.cmd_text_others
 
+        cmd = controller.button_text.get(cmd, cmd)
+
         cmd = ' ' * (controller.maxlen_cmd - len(cmd)) + cmd
         umaxlen = 20
         user += ' ' * (umaxlen - min(len(user), umaxlen))
@@ -171,7 +174,6 @@ class Main(object):
             self.ui.frame_user.setEnabled(False)
 
         def save_pc_user():
-            print('CALL')
             name = self.ui.edit_name.text()
             period = self.ui.pc_period.value()
             if self.current_user is not None:
@@ -188,7 +190,7 @@ class Main(object):
 
         def set_mode(index):
             mode = self.ui.mode.itemText(index).lower()
-            print(mode)
+            log.logger.log(type='gameplay', action='change_mode', content=mode)
             config.selected = mode
             self.uic.l_mode.setText(mode.capitalize())
             self.uic.f_democracy.setShown(mode != 'anarchy')
@@ -265,5 +267,10 @@ class Main(object):
         set_mode(config.mode_idx(config.selected))
 
 if __name__ == '__main__':
+    log.logger.log(type='meta', message='Program started')
     prog = Main()
     prog.app.exec_()
+    # This is not being called.
+    # TODO: hook these things to the quit signal from Qt.
+    # TODO: also close all the TCP connections!
+    log.logger.stop()

@@ -4,6 +4,7 @@ import config
 import buffer
 import controller
 from user import PersonUser
+from log import logger
 
 
 class OriginServer(object):
@@ -32,7 +33,10 @@ class Handler(socketserver.BaseRequestHandler):
         self.buffer = buffer.Buffer(self.request)
         ip = self.client_address[0]
         self.user = PersonUser.get(ip, ip)
-        print('TCP Connection:', self.user)
+        #print('TCP Connection:', self.user)
+        logger.debug(type='tcp', action='connection',
+                     user=[self.user.ip, self.user.name],
+                     content=None)
 
         while True:
             try:
@@ -50,11 +54,17 @@ class Handler(socketserver.BaseRequestHandler):
         return self.buffer.read(size[0], True)
 
     def handle_content(self, content):
-        print('Data @ {0.name}, {0.ip}:'.format(self.user), bytes(content), list(content))
-
+        orig_content = content
         content = controller.find_command(content)
         if content is None:
+            logger.debug(type='tcp', action='invalid_command',
+                         user=[self.user.ip, self.user.name],
+                         content=orig_content)
             return
+
+        logger.debug(type='tcp', action='command',
+                     user=[self.user.ip, self.user.name],
+                     content=content, bytes=orig_content)
 
         cmd, st = content
         if st == controller.CommandType.text:
@@ -68,9 +78,11 @@ class UDPHandler(Handler):
     def handle(self):
         data, sock = self.request
         if data == b'MAX-REMOTE':
-            print('Handshake:', self.client_address[0])
+            logger.log(type='udp', action='handshake',
+                       content=self.client_address)
         else:
-            print('UDP Data:', repr(data))
+            logger.log(type='udp', action='data',
+                       content=repr(data))
 
         sock.sendto(config.server_name, self.client_address)
 
@@ -81,7 +93,9 @@ def load(daemon=True):
 
     server_tcp = TCPServer((host, port), Handler)
     server_udp = UDPServer((host, port), UDPHandler)
-    print(host, ':', port, sep='')
+    #print(host, ':', port, sep='')
+    logger.info(type='meta', action='server_listen',
+                content='{}:{}'.format(host, port))
 
     threading.Thread(target=server_tcp.serve_forever, daemon=daemon).start()
     threading.Thread(target=server_udp.serve_forever, daemon=daemon).start()
